@@ -1,0 +1,32 @@
+#include <stdio.h>
+
+int main() {
+    int n;
+    scanf("%d", &n);
+
+    int arr[n];
+    for(int i = 0; i < n; i++) {
+        scanf("%d", &arr[i]);
+    }
+
+    int prefixSum = 0;
+    int count = 0;
+
+    // Assuming sum range is manageable
+    int freq[1000] = {0};  // Adjust size if needed
+    freq[0] = 1;  // Important: sum 0 occurs once initially
+
+    for(int i = 0; i < n; i++) {
+        prefixSum += arr[i];
+
+        if(freq[prefixSum + 500] != 0) {   // shift for negative index
+            count += freq[prefixSum + 500];
+        }
+
+        freq[prefixSum + 500]++;
+    }
+
+    printf("%d", count);
+
+    return 0;
+}
