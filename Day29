@@ -1,0 +1,70 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct node {
+    int data;
+    struct node* next;
+};
+
+int main() {
+    int n, k, i;
+    scanf("%d", &n);
+
+    if (n <= 0)
+        return 0;
+
+    struct node *head = NULL, *temp = NULL, *newnode;
+
+    for(i = 0; i < n; i++) {
+        newnode = (struct node*)malloc(sizeof(struct node));
+        scanf("%d", &newnode->data);
+        newnode->next = NULL;
+
+        if(head == NULL) {
+            head = newnode;
+            temp = newnode;
+        } else {
+            temp->next = newnode;
+            temp = newnode;
+        }
+    }
+
+    scanf("%d", &k);
+
+    int count = 1;
+    temp = head;
+    while(temp->next != NULL) {
+        temp = temp->next;
+        count++;
+    }
+
+    k = k % count;
+    if (k == 0) {
+        temp = head;
+        while(temp != NULL) {
+            printf("%d ", temp->data);
+            temp = temp->next;
+        }
+        return 0;
+    }
+
+    temp->next = head;
+
+    int steps = count - k;
+    struct node* newTail = head;
+
+    for(i = 1; i < steps; i++) {
+        newTail = newTail->next;
+    }
+
+    head = newTail->next;
+    newTail->next = NULL;
+
+    temp = head;
+    while(temp != NULL) {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    }
+
+    return 0;
+}
