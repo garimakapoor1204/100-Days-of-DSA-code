@@ -1,0 +1,113 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+
+#define MAX 100
+
+typedef struct {
+    int vertex;
+    int distance;
+} Node;
+
+typedef struct {
+    Node heap[MAX];
+    int size;
+} MinHeap;
+
+void swap(Node *a, Node *b) {
+    Node temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+void heapifyUp(MinHeap *h, int index) {
+    while (index && h->heap[index].distance < h->heap[(index - 1) / 2].distance) {
+        swap(&h->heap[index], &h->heap[(index - 1) / 2]);
+        index = (index - 1) / 2;
+    }
+}
+
+void heapifyDown(MinHeap *h, int index) {
+    int smallest = index;
+    int left = 2 * index + 1;
+    int right = 2 * index + 2;
+
+    if (left < h->size && h->heap[left].distance < h->heap[smallest].distance)
+        smallest = left;
+
+    if (right < h->size && h->heap[right].distance < h->heap[smallest].distance)
+        smallest = right;
+
+    if (smallest != index) {
+        swap(&h->heap[index], &h->heap[smallest]);
+        heapifyDown(h, smallest);
+    }
+}
+
+void insertHeap(MinHeap *h, int vertex, int distance) {
+    h->heap[h->size].vertex = vertex;
+    h->heap[h->size].distance = distance;
+    heapifyUp(h, h->size);
+    h->size++;
+}
+
+Node extractMin(MinHeap *h) {
+    Node root = h->heap[0];
+    h->heap[0] = h->heap[h->size - 1];
+    h->size--;
+    heapifyDown(h, 0);
+    return root;
+}
+
+int isEmpty(MinHeap *h) {
+    return h->size == 0;
+}
+
+void dijkstra(int graph[MAX][MAX], int n, int src) {
+    int dist[MAX];
+    int visited[MAX] = {0};
+
+    for (int i = 0; i < n; i++)
+        dist[i] = INT_MAX;
+
+    MinHeap h;
+    h.size = 0;
+
+    dist[src] = 0;
+    insertHeap(&h, src, 0);
+
+    while (!isEmpty(&h)) {
+        Node current = extractMin(&h);
+        int u = current.vertex;
+
+        if (visited[u]) continue;
+        visited[u] = 1;
+
+        for (int v = 0; v < n; v++) {
+            if (graph[u][v] && !visited[v] &&
+                dist[u] + graph[u][v] < dist[v]) {
+                dist[v] = dist[u] + graph[u][v];
+                insertHeap(&h, v, dist[v]);
+            }
+        }
+    }
+
+    for (int i = 0; i < n; i++)
+        printf("%d ", dist[i]);
+}
+
+int main() {
+    int n, graph[MAX][MAX], src;
+
+    scanf("%d", &n);
+
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            scanf("%d", &graph[i][j]);
+
+    scanf("%d", &src);
+
+    dijkstra(graph, n, src);
+
+    return 0;
+}
