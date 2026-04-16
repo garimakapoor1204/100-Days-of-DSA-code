@@ -1,0 +1,64 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 1000
+
+// Simple hash map using arrays
+typedef struct {
+    int key;
+    int value;
+} Hash;
+
+Hash hash[MAX];
+int size = 0;
+
+// Find key in hash
+int find(int key) {
+    for (int i = 0; i < size; i++) {
+        if (hash[i].key == key)
+            return hash[i].value;
+    }
+    return -1;
+}
+
+// Insert key-value pair
+void insert(int key, int value) {
+    hash[size].key = key;
+    hash[size].value = value;
+    size++;
+}
+
+int maxLenZeroSum(int arr[], int n) {
+    int sum = 0, maxLen = 0;
+
+    for (int i = 0; i < n; i++) {
+        sum += arr[i];
+
+        if (sum == 0)
+            maxLen = i + 1;
+
+        int prevIndex = find(sum);
+
+        if (prevIndex != -1) {
+            int len = i - prevIndex;
+            if (len > maxLen)
+                maxLen = len;
+        } else {
+            insert(sum, i);
+        }
+    }
+
+    return maxLen;
+}
+
+int main() {
+    int arr[MAX], n;
+
+    scanf("%d", &n);
+    for (int i = 0; i < n; i++)
+        scanf("%d", &arr[i]);
+
+    printf("%d\n", maxLenZeroSum(arr, n));
+
+    return 0;
+}
