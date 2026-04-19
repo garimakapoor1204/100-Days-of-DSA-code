@@ -1,0 +1,84 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+
+#define MAX 100
+
+int n, m;
+
+// adjacency matrix
+int graph[MAX][MAX];
+
+// visited array
+int visited[MAX];
+
+// find minimum key vertex
+int minKey(int key[], int visited[]) {
+    int min = INT_MAX, min_index;
+
+    for (int v = 0; v < n; v++) {
+        if (visited[v] == 0 && key[v] < min) {
+            min = key[v];
+            min_index = v;
+        }
+    }
+    return min_index;
+}
+
+int primMST() {
+    int parent[MAX];   // store MST
+    int key[MAX];      // minimum weights
+
+    // initialize
+    for (int i = 0; i < n; i++) {
+        key[i] = INT_MAX;
+        visited[i] = 0;
+    }
+
+    key[0] = 0;   // start from node 0
+    parent[0] = -1;
+
+    int totalWeight = 0;
+
+    for (int count = 0; count < n; count++) {
+        int u = minKey(key, visited);
+        visited[u] = 1;
+
+        totalWeight += key[u];
+
+        for (int v = 0; v < n; v++) {
+            if (graph[u][v] && visited[v] == 0 && graph[u][v] < key[v]) {
+                parent[v] = u;
+                key[v] = graph[u][v];
+            }
+        }
+    }
+
+    return totalWeight;
+}
+
+int main() {
+    scanf("%d %d", &n, &m);
+
+    // initialize graph
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            graph[i][j] = 0;
+
+    // input edges
+    for (int i = 0; i < m; i++) {
+        int u, v, w;
+        scanf("%d %d %d", &u, &v, &w);
+
+        // convert 1-based → 0-based
+        u--; v--;
+
+        graph[u][v] = w;
+        graph[v][u] = w;
+    }
+
+    int result = primMST();
+    printf("%d\n", result);
+
+    return 0;
+}
